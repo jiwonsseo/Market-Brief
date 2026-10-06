@@ -279,6 +279,10 @@ def call_gemini(system, user):
             if not r.ok:
                 last_err = f"{model}: {r.status_code} {r.text[:300]}"
                 break  # 모델명 오류 등 → 다음 모델 시도
+           if not r.ok:
+                last_err = f"{model}: {r.status_code} {r.text[:300]}"
+                print(f"[Gemini] {last_err}")
+                break  # 모델명 오류 등 → 다음 모델 시도
             parts = r.json()["candidates"][0]["content"]["parts"]
             text = "".join(p.get("text", "") for p in parts if not p.get("thought"))
             if text.strip():
