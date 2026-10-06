@@ -259,7 +259,7 @@ USER_TMPL = """브리핑 날짜: {kst} (KST), 대상 미국 거래일: {us_date}
 
 def call_gemini(system, user):
     key = os.environ["GEMINI_API_KEY"]
-    models = [os.environ.get("GEMINI_MODEL") or "gemini-flash-latest", "gemini-2.5-flash"]
+    models = [os.environ.get("GEMINI_MODEL") or "gemini-3.8-flash", "gemini-flash-latest"]
     body = {
         "systemInstruction": {"parts": [{"text": system}]},
         "contents": [{"role": "user", "parts": [{"text": user}]}],
