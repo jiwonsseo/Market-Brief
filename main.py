@@ -259,7 +259,7 @@ USER_TMPL = """브리핑 날짜: {kst} (KST), 대상 미국 거래일: {us_date}
 
 def call_gemini(system, user):
     key = os.environ["GEMINI_API_KEY"]
-    models = [os.environ.get("GEMINI_MODEL") or "gemini-3.8-flash", "gemini-flash-latest"]
+    models = [os.environ.get("GEMINI_MODEL") or "gemini-flash-latest", "gemini-3.8-flash"]
     body = {
         "systemInstruction": {"parts": [{"text": system}]},
         "contents": [{"role": "user", "parts": [{"text": user}]}],
@@ -278,11 +278,16 @@ def call_gemini(system, user):
                 continue
             if not r.ok:
                 last_err = f"{model}: {r.status_code} {r.text[:300]}"
-                break  # 모델명 오류 등 → 다음 모델 시도
-           if not r.ok:
-                last_err = f"{model}: {r.status_code} {r.text[:300]}"
                 print(f"[Gemini] {last_err}")
                 break  # 모델명 오류 등 → 다음 모델 시도
+
+            parts = r.json()["candidates"][0]["content"]["parts"]
+            text = "".join(
+                p.get("text", "") for p in parts if not p.get("thought")
+            )
+            if text.strip():
+                print(f"[Gemini] 사용 모델: {model}")
+                return text.strip()
             parts = r.json()["candidates"][0]["content"]["parts"]
             text = "".join(p.get("text", "") for p in parts if not p.get("thought"))
             if text.strip():
